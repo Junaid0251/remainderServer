@@ -30,22 +30,22 @@ app.use(cors({
 
 //----------remainder server ---------------
 
-    // const jwtMiddleware=(req,res,next)=>{
-    //     try {
-    //         const token = req.headers["x-access-token"]
-    //         const data = jwt.verify(token,'secretcode')
-    //         req.currentemail = data.currentemail
-    //         next()
-    //     }
+    const jwtMiddleware=(req,res,next)=>{
+        try {
+            const token = req.headers["x-access-token"]
+            const data = jwt.verify(token,'secretcode')
+            req.currentemail = data.currentemail
+            next()
+        }
 
-    //     catch{
-    //         res.status(401).json({
-    //             status:false,
-    //             message:"please log in!!!!"
-    //         })
-    //     }
+        catch{
+            res.status(401).json({
+                status:false,
+                message:"please log in!!!!"
+            })
+        }
 
-    // }
+    }
 
 
 
@@ -69,8 +69,8 @@ app.post('/login',(req,res)=>{
 
 //add event
 
-app.post('/addEvent',(req,res)=>{
-    dataservice.addEvent(req.body.email,req.body.event,req.body.date)
+app.post('/addEvent',jwtMiddleware,(req,res)=>{
+    dataservice.addEvent(req,req.body.email,req.body.event,req.body.date)
     .then(result=>{
         res.status(result.statuscode).json(result)
     })
@@ -78,7 +78,7 @@ app.post('/addEvent',(req,res)=>{
 
 //view event
 
-app.post('/viewEvent',(req,res)=>{
+app.post('/viewEvent',jwtMiddleware,(req,res)=>{
     dataservice.viewEvent(req.body.email)
     .then(result=>{
         res.status(result.statuscode).json(result)
@@ -86,6 +86,22 @@ app.post('/viewEvent',(req,res)=>{
 })
 
 
+//delete event
+app.delete('/deleteEvent:email',jwtMiddleware,(req,res)=>{
+    dataservice.deletEevent(req,req.params.email)
+    .then(result=>{
+        res.status(result.statuscode).json(result)
+    })
+})
+
+//cardView
+
+app.post('/cardView',(req,res)=>{
+    dataservice.cardView(req.body.email)
+    .then(result=>{
+        res.status(result.statuscode).json(result)
+    })
+})
 
 
 
